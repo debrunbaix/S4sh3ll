@@ -1,49 +1,11 @@
+#include <sys/wait.h>
 #include <dirent.h>
 #include <unistd.h>
-#include <sys/types.h>
-#include <sys/wait.h>
 #include <stdlib.h>
-#include <stdio.h>
-#include <stdbool.h>
 #include <string.h>
+#include <stdio.h>
 
-char *pathList[10];
-FILE *sashellrc_file;
-char sashellrc[50];
-
-void getSashellrcContent() {
-  
-  sashellrc_file = fopen(".sashellrc", "r");
-  
-  if (sashellrc_file == NULL) {
-    perror("Failed to open .sashellrc");
-    exit(EXIT_FAILURE);
-  }
-  if (fgets(sashellrc, sizeof(sashellrc), sashellrc_file) == NULL) {
-    perror("Failed to read from .sashellrc");
-    fclose(sashellrc_file);
-    exit(EXIT_FAILURE);
-  }
-  fclose(sashellrc_file);
-
-  size_t len = strlen(sashellrc);
-  if (len > 0 && sashellrc[len - 1] == '\n') {
-    sashellrc[len - 1] = '\0';
-  }
-}
-
-void getPathList() {
-  
-  getSashellrcContent();
-  
-  int pathCount = 0;
-  char *token = strtok(sashellrc, ":");
-  
-  while (token != NULL && pathCount < 10) {
-    pathList[pathCount++] = token;
-    token = strtok(NULL, ":");
-  }
-}
+#include "sashellrc.c"
 
 int execExternalCommand(char *user_choice) {
 
