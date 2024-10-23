@@ -1,3 +1,9 @@
+/**
+ * \file		   extCmdManagement.c
+ * \brief		   To manage the execution of external command.
+ * \author		 Debrunbaix
+ */
+
 #include <sys/wait.h>
 #include <dirent.h>
 #include <unistd.h>
@@ -7,29 +13,32 @@
 
 #include "sashellrc.c"
 
-int execExternalCommand(char *user_choice) {
+int 
+exec_ext_cmd(char* user_choice) {
+  /*
+    Function to execute command that are in the PATH variable.
+  */
+  get_path_list();
 
-  getPathList();
+  char full_path[150];
 
-  char fullPath[150];
-
-  for (int i = 0; i < 10 && pathList[i] != NULL; i++) {
-    DIR *dr = opendir(pathList[i]);
+  for (int i = 0; i < 10 && path_list[i] != NULL; i++) {
+    DIR* dr = opendir(path_list[i]);
     if (dr == NULL) {
       perror("Failed to open directory");
       continue;
     }
 
-    struct dirent *de;
+    struct dirent* de;
     while ((de = readdir(dr)) != NULL) {
       if (strcmp(user_choice, de->d_name) == 0) {
-        snprintf(fullPath, sizeof(fullPath), "%s/%s", pathList[i], user_choice);
-        printf("Found: %s\n", fullPath);
+        snprintf(full_path, sizeof(full_path), "%s/%s", path_list[i], user_choice);
+        printf("Found: %s\n", full_path);
 
         pid_t pid = fork();
         if (pid == 0) {
           char *args[] = {user_choice, NULL};
-          execve(fullPath, args, NULL);
+          execve(full_path, args, NULL);
           perror("execve failed");
           exit(EXIT_FAILURE);
         } else if (pid > 0) {
